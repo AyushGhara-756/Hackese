@@ -9,6 +9,8 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.jail.hackese.users.dto.RequestDTO;
 import org.jail.hackese.users.dto.ResponseDTO;
+import org.springframework.boot.web.server.Cookie;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,17 +23,18 @@ import java.util.function.Function;
 @Service
 public class JWTService {
 
-    private static String secretkey;
-    private static BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+    private static String secretkey = null;
+    private static BCryptPasswordEncoder encoder = null;
 
     @PostConstruct
     public void init() {
         try {
+            encoder = new BCryptPasswordEncoder(12);
             KeyGenerator generator = KeyGenerator.getInstance("HmacSHA256");
             SecretKey sk = generator.generateKey();
             secretkey = Base64.getEncoder().encodeToString(sk.getEncoded());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error: "+e);
         }
     }
 
@@ -69,21 +72,56 @@ public class JWTService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public boolean validate(String token, UserDetails user){
-        return (user.getUsername().equals(extractUsername(token)));
+    public boolean expired(String token){
+        return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
-    public String generateToken(ResponseDTO dto){
+    public boolean validate(String token, UserDetails user){
+        return user.getUsername().equals(extractUsername(token)) && !expired(token);
+    }
+
+    private String generateAccessToken(Long userid){
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
                 .claims()
                 .add(claims)
-                .subject(dto.userid().toString())
+                .subject(userid.toString())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                // need to add expiry. after discussion
+                .expiration(new Date(System.currentTimeMillis() + 3600*1000L))
                 .and()
                 .signWith(retriveKey())
                 .compact();
+    }
+
+    public ResponseCookie generateAccessCookie(ResponseDTO dto){
+        return ResponseCookie.from("ACCESS_COOKIE",generateAccessToken(dto.userid()))
+                .maxAge(3600)
+                .path("/")
+                .httpOnly(true)
+                .sameSite("Lax")
+                .build();
+    }
+
+    private String generateRefreshToken(Long userid){
+        Map<String, Object> claims = new HashMap<>();
+        return Jwts.builder()
+                .claims()
+                .add(claims)
+                .subject(userid.toString())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration( new Date(System.currentTimeMillis() + 1000*60*60*24*7L))
+                .and()
+                .signWith(retriveKey())
+                .compact();
+    }
+
+    public ResponseCookie generateRefreshCookie(ResponseDTO dto){
+        return ResponseCookie.from("REFRESH_COOKIE", generateRefreshToken(dto.userid()))
+                .maxAge(60*60*24*7L)
+                .sameSite("Strict")
+                .path("/refresh")
+                .httpOnly(true)
+                .build();
     }
 
 }
