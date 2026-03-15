@@ -21,6 +21,10 @@
   header p {
    font-family: 'Audiowide', cursive;
    margin: 0;
+   transform: translateX(20px);
+   /* right */
+   transform: translateX(40px);
+   /* left */
   }
 
   header {
@@ -50,6 +54,46 @@
    cursor: pointer;
    font-family: 'Audiowide', cursive;
   }
+
+  #ads {
+   display: flex;
+   width: 800px;
+   height: 200px;
+   border: 1px solid #ffffff;
+   border-radius: 20px;
+   box-sizing: border-box;
+   background: rgba(255, 255, 255, 0.02);
+   align-items: center;
+   justify-content: center;
+   margin: 1rem 0;
+   margin-left: 3rem;
+  }
+
+  #content {
+   max-width: 800px;
+   margin: 2rem 0;
+   margin-left: 3rem;
+   padding: 0 1rem;
+  }
+
+  #f {
+   margin-left: 3rem;
+   font-family: 'Audiowide', cursive;
+  }
+
+  .cmp-card {
+   box-sizing: border-box;
+   border-radius: 20px;
+   border: 1px solid #ffffff;
+   width: 200px;
+   height: 150px;
+  }
+
+  .cmp-cards-container {
+   display: flex;
+   gap: 1rem;
+   flex-wrap: wrap;
+  }
  </style>
 </head>
 
@@ -65,8 +109,29 @@
   </div>
  </header>
  <main>
-
- </main>
+  <div id="f">
+   <P> featured:</P>
+  </div>
+  <div id="ads">
+   <h5><i> </i></h5>
+  </div>
+  <div id="content">
+   <h2>Discover competitions!</h2>
+   <div class="cmp-cards-container">
+    <div class="cmp-card">
+     <i></i>
+    </div>
+    <div class="cmp-card">
+     <i></i>
+    </div>
+    <div class="cmp-card">
+     <i></i>
+    </div>
+    <div class="cmp-card">
+     <i></i>
+    </div>
+   </div>
+  </div>
 </body>
 
 </html>
