@@ -29,8 +29,8 @@ public class UserControl {
     private DetailsService detailsService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user){
-        User register = userService.registerUser(user);
+    public ResponseEntity<?> register(@RequestBody RequestDTO requestDTO){
+        User register = userService.registerUser(requestDTO);
         if(register==null){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists with given email");
         }

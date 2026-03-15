@@ -20,10 +20,14 @@ public class UserService {
         return repo.findById(Long.parseLong(username)).get();
     }
 
-    public User registerUser(User user){
-        if (!repo.existsByEmail(user.getEmail())){
-            user.setPassword(jwtservice.encodePassword(user.getPassword()));
-            return repo.save(user);
+    public User registerUser(RequestDTO user){
+        if (!repo.existsByEmail(user.email())){
+            User save =  new User();
+            save.setName(user.name());
+            save.setEmail(user.email());
+            save.setPassword(jwtservice.encodePassword(user.password()));
+            save.setDob(user.dob());
+            return repo.save(save);
         }
         else {
             return null;
