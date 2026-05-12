@@ -1,15 +1,11 @@
 package org.jail.hackese.security.service;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoder;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import org.jail.hackese.users.dto.RequestDTO;
-import org.jail.hackese.users.dto.ResponseDTO;
-import org.springframework.boot.web.server.Cookie;
+import org.jail.hackese.users.dto.UserResponseDTO;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -93,7 +89,7 @@ public class JWTService {
                 .compact();
     }
 
-    public ResponseCookie generateAccessCookie(ResponseDTO dto){
+    public ResponseCookie generateAccessCookie(UserResponseDTO dto){
         return ResponseCookie.from("ACCESS_COOKIE",generateAccessToken(dto.userid()))
                 .maxAge(3600)
                 .path("/")
@@ -115,7 +111,7 @@ public class JWTService {
                 .compact();
     }
 
-    public ResponseCookie generateRefreshCookie(ResponseDTO dto){
+    public ResponseCookie generateRefreshCookie(UserResponseDTO dto){
         return ResponseCookie.from("REFRESH_COOKIE", generateRefreshToken(dto.userid()))
                 .maxAge(60*60*24*7L)
                 .sameSite("Strict")

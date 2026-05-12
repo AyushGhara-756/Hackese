@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpSession;
 import org.jail.hackese.security.service.DetailsService;
 import org.jail.hackese.security.service.JWTService;
 import org.jail.hackese.users.dto.RequestDTO;
-import org.jail.hackese.users.dto.ResponseDTO;
+import org.jail.hackese.users.dto.UserResponseDTO;
 import org.jail.hackese.users.entity.User;
 import org.jail.hackese.users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class UserControl {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody RequestDTO requestDTO, HttpServletResponse response){
-        ResponseDTO loggedin = userService.loginUser(requestDTO);
+        UserResponseDTO loggedin = userService.loginUser(requestDTO);
         if(loggedin==null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
@@ -70,7 +70,7 @@ public class UserControl {
         }
 
         response.addHeader(HttpHeaders.SET_COOKIE, jwtService
-                .generateAccessCookie(new ResponseDTO(Long.parseLong(details.getUsername()))).toString());
+                .generateAccessCookie(new UserResponseDTO(Long.parseLong(details.getUsername()))).toString());
         return ResponseEntity.ok().build();
     }
 

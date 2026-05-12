@@ -2,7 +2,7 @@ package org.jail.hackese.users.service;
 
 import org.jail.hackese.security.service.JWTService;
 import org.jail.hackese.users.dto.RequestDTO;
-import org.jail.hackese.users.dto.ResponseDTO;
+import org.jail.hackese.users.dto.UserResponseDTO;
 import org.jail.hackese.users.entity.User;
 import org.jail.hackese.users.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +34,17 @@ public class UserService {
         }
     }
 
-    public ResponseDTO loginUser(RequestDTO requestDTO){
+    public UserResponseDTO loginUser(RequestDTO requestDTO){
         User user = repo.findByEmail(requestDTO.email());
         if(user != null){
             if (jwtservice.matchPassword(requestDTO.password(), user.getPassword())) {
-                return new ResponseDTO(user.getUserid());
+                return new UserResponseDTO(user.getUserid());
             }
         }
         return null;
+    }
+
+    public User getUserById(long id){
+        return repo.findById(id).orElse(null);
     }
 }
